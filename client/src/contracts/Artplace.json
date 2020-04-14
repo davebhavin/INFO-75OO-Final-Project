@@ -8178,12 +8178,13 @@
         }
       },
       "links": {},
-      "address": "0x20B40e09b75a21E0B857F695dE5De92a5A5b5AD0",
-      "transactionHash": "0x0f619abd5eeb8c1441f0a900638448e8adfdc048518f6611021e8ca899d24b87"
+      "address": "0x45D9eA5F676Adfb3998a5a4aa59b9601A11C46a3",
+      "transactionHash": "0xa54c570419ed3c0342900974a21b4ecbe1578a641e6474317f01e452887a83b2"
     }
   },
   "schemaVersion": "3.0.23",
-  "updatedAt": "2020-04-07T19:54:41.291Z",
+  "updatedAt": "2020-04-13T01:35:12.002Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {}
   },

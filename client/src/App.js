@@ -1,71 +1,237 @@
-import React, { Component } from "react";
-import 'bootstrap/dist/css/bootstrap.min.css';
-import LPage from './LPage';
-import "./App.css";
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from "react-router-dom";
+  import React, { Component } from "react";
+  import 'bootstrap/dist/css/bootstrap.min.css';
+  import LPage from './LPage';
+  import "./App.css";
+  import Navbar from './navbar';
+  import Main from './Main';
+  import moment from 'moment';
+  import _ from 'lodash';
 
-class App extends Component {
+  import getWeb3 from "./getWeb3";
+  import Artplace from './contracts/Artplace.json'
+  import Audit from "./Audit";
+  import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
+    Link
+  } from "react-router-dom";
+
+  class App extends Component {
+    
+    componentDidMount = async () => {
+
+      try {
+          const web3 = await getWeb3();
+          const account = await web3.eth.getAccounts();
+          this.setState({ account: account[0] })
+          const networkId = await web3.eth.net.getId();
+          const deployedNetwork = Artplace.networks[networkId];
+          
+          
+          const instance = new web3.eth.Contract(
+            Artplace.abi,
+            deployedNetwork && deployedNetwork.address,
+          );
+        
+          /* web3.eth.getBlock(20)
+          .then(function(value) {
+            console.log(value.timestamp);
+            var timestamp = moment.unix(value.timestamp);
+            console.log(timestamp.format('MMMM Do YYYY, h:mm:ss a'));
+            // expected output: "Success!"
+          }); */
+          
+         /*   instance.events.Artworkcreated({
+            fromBlock: 0
+        }, function(error, event){  
+         console.log(event); 
+          //const Count =  this.state.pass(i).call();
+        //  for (var i = 1; i <= Count; i++) {
+       //   this.setState({
+       //       pass:[...this.state.pass(i).call(),event.returnValues.Artname]
+       //     })
+        }) */
+        
+          
+          const ArtworkCount = await instance.methods.ArtworkCount().call();
+          const createArtwork = await instance.events.createArtwork;
+          const purchaseArtwork= await instance.events.purchaseArtwork;
+          this.setState({ web3, instance ,ArtworkCount,createArtwork,purchaseArtwork}, this.runExample);
+          for (var i = 1; i <= ArtworkCount; i++) {
+            const Artwork = await instance.methods.Artworks(i).call()
+            this.setState({
+              Artworks: [...this.state.Artworks, Artwork]
+            })
+          }
+
+        console.log(ArtworkCount.toString());
+          this.setState({ loading: false});
+        } catch (error) {
+          alert(
+            `Failed to load web3, accounts, or contract. Check console for details.`,
+          );
+          console.error(error);
+        }
+        var loc = window.location.pathname;
+        var dir = loc.substring(0, loc.lastIndexOf('/'));
+        console.log(dir);
+
+
+  }
+
+
+
+  constructor(props) {
+  super(props)
   
- 
- 
-  render() {
-    return (
-      <Router>
-      <div>
-        <hr />
+    this.state = {
+      dir:"",
+    account: '',
+    name: [],
+    createArtwork: '',
+    purchaseArtwork: '',
+    ArtworkCount: 0,
+    Artworks: [],
+    loading: true
+  }
+  this.showProfile = this.showProfile.bind(this);
+  this.createArtwork = this.createArtwork.bind(this);
+  this.showusingID = this.showusingID.bind(this);
+  this.purchaseArtwork = this.purchaseArtwork.bind(this);
+  }
 
-        <Switch>
-          <Route exact path="/">
-            <Home />
-          </Route>
-          <Route path="/about">
-            <About />
-          </Route>
-          <Route path="/audit">
-            <Audit />
-          </Route>
-        </Switch>
-      </div>
-    </Router>
-    );
+  createArtwork(Artistname,Artname,price,width,height,Description) {
+  this.setState({ loading: true })
+  this.state.instance.methods.createArtwork(Artistname,Artname,price,width,height,Description).send({ from: this.state.account })
+  .once('receipt', (receipt) => {
+  this.setState({ loading: false })
+  })
+  }
+  showProfile(owners){
+    
+    this.state.instance.events.allEvents({
+         filter: { owner: owners},
+         fromBlock: 0
+     }, function(error, event){  
+      console.log(event);
+       //const Count =  this.state.pass(i).call();
+     //  for (var i = 1; i <= Count; i++) {
+    //   this.setState({
+    //       pass:[...this.state.pass(i).call(),event.returnValues.Artname]
+    //     })
+      }
+      )
+    }
+    showusingBot= () => {
+    
+      this.state.instance.events.Artworkcreated({
+           filter: { purchased: true},
+           fromBlock: 0
+       }).on('data', event => {
+        this.setState({name:[...this.state.name,event.returnValues.Artistname ]});
+        })
+      }
+      showusingID = ids => {
+       
+        this.state.instance.events.Artworkcreated({
+          filter: { id: ids},
+          fromBlock: 0,
+        }
+        )
+        .on('data', event => {
+          console.log(event)
+          this.setState({name:[...this.state.name,event.returnValues.Artistname ]});
+        })
+      }
+
+  purchaseArtwork(id, price) {
+    this.setState({ loading: true })
+    this.state.instance.methods.purchaseArtwork(id).send({ from: this.state.account, value: price })
+    .once('receipt', (receipt) => {
+    this.setState({ loading: false })
+  })
   }
   
-}
+  
+    render() {
+      return (
+        
+        <Router>
+        <div>
+          <hr />
 
-function Home() {
-  return (
+          <Switch>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route path="/trad">
+            <Navbar account={this.state.account} />
+            <div className="container-fluid mt-5">
+              <div className="row">
+              <main role="main" className="col-lg-12 d-flex">
+                  { this.state.loading 
+                  ? <div id="loader" className="text-center"><p className="text-center">Loading...</p></div>
+                  : <Main 
+                  Artworks={this.state.Artworks}
+                  createArtwork={this.createArtwork}
+                  purchaseArtwork={this.purchaseArtwork}
+                  /> 
+                    }
+                      
+              </main>
+              </div>
+            </div>
+            </Route>
+            <Route path="/audit">
+              <Audit 
+              Artworks={this.state.Artworks}
+              instance={this.state.instance}
+              name={this.state.name}
+                  createArtwork={this.createArtwork}
+                  showProfile={this.showProfile}
+                  showusingID={this.showusingID}
+                  showusingBot={this.showusingBot}
+                  events={this.events}
+                  purchaseArtwork={this.purchaseArtwork}/>
+            </Route>
+          </Switch>
+        </div>
+      </Router>
+      );
+    }
     
-    <div class="card-group">
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title">Title</h4>
-            <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><button class="btn btn-primary" type="button">Button</button></div>
-    </div>
-    <div class="card">
-        <div class="card-body">
-            <h4 class="card-title">Title</h4>
-            <p class="card-text">Nullam id dolor id nibh ultricies vehicula ut id elit. Cras justo odio, dapibus ac facilisis in, egestas eget quam. Donec id elit non mi porta gravida at eget metus.</p><Link to="/about">About</Link></div>
-    </div>
-</div>
-    
+  }
 
-  );
-}
+  function Home() {
+    return (
+      
+      <div class="card-group">
+      <div class="card">
+          <div class="card-body">
+              <h4 class="card-title">Regular Trading</h4>
+              <p class="card-text">Here the seller, have the option to sell to the buyer suing traditional buying/seling methods in a decentraized manner.</p><Link to="/trad">Trade</Link></div>
+      </div>
+      <div class="card">
+          <div class="card-body">
+              <h4 class="card-title">Auction</h4>
+              <p class="card-text">comming soon</p><Link to="/trad"></Link></div>
+      </div>
+      <div class="card">
+          <div class="card-body">
+              <h4 class="card-title">Audit</h4>
+              <p class="card-text">Auditing the smart contract's events</p><Link to="/audit">Audit</Link></div>
+      </div>
 
-function About() {
-  return (
-    <div><LPage></LPage></div>
-  );
-}
-function Audit() {
-  return (
-    <div><Audit></Audit></div>
-  );
-}
+      <input type="file" id="input" multiple>
+     
+      </input>
+  </div>
+      
 
-export default App;
+    );
+  }
+
+  
+
+  export default App;

@@ -7,8 +7,8 @@ class Main extends Component {
   render() {
     //const web3 = await getWeb3();
     return (
-        
-      <div id="content">
+        <div id="lol">
+      <div id="add">
         <h1>Add Artwork</h1>
         <form onSubmit={(event) => {
           event.preventDefault()
@@ -79,14 +79,16 @@ class Main extends Component {
           <button type="submit" className="btn btn-primary">Add Artpiece</button>
         </form>
         <p> </p>
+      </div><div id="buy">
         
-        <h2>Buy Artwork</h2>
+        <h1>Buy Artwork</h1>
         <table className="table">
 
         <thead>
         <tr>
-          <th scope="col">#</th>
+          <th scope="col">Index</th>
           <th scope="col">Artist Name</th>
+          <th scope="col">Art Name</th>
           <th scope="col">Price</th>
           <th scope="col">Owner</th>
           <th scope="col"></th>
@@ -99,15 +101,16 @@ class Main extends Component {
           
             <th scope="row">{Artwork.id.toString()}</th>
             <td>{Artwork.Artistname}</td>
+            <td>{Artwork.Artname}</td>
             <td>{window.web3.fromWei(Artwork.price.toString(), 'Ether')} Eth</td>
             <td>{Artwork.owner}</td>
             <td>
-              { !Artwork.purchased
+              { Artwork.purchased==false
                 ? <button
                     name={Artwork.id}
                     value={Artwork.price}
                     onClick={(event) => {
-                      this.props.purchaseArtwork(event.target.Artistname, event.target.value)
+                      this.props.purchaseArtwork(event.target.name, event.target.value)
                     }}
                   >
                     Buy
@@ -123,7 +126,7 @@ class Main extends Component {
       </tbody>
         </table>
       </div>
-      
+      </div>
     );
   }
 }
