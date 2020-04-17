@@ -72,24 +72,52 @@ contract('Artplace', ([deployer,seller,buyer]) => {
       assert.equal(event.purchased, true, 'purchased is correct')
     
       
-      let newBalance
-      newBalance = await web3.eth.getBalance(seller)
-      newBalance = new web3.utils.BN(newBalance)//checks whether seller have received the funds
-    
-      let price
-      price = web3.utils.toWei('1', 'Ether')
-      price = new web3.utils.BN(price)
-    
-      const exepectedBalance = oldBalance.add(price)
-    
-      assert.equal(newBalance.toString(), exepectedBalance.toString())
-    
       
-      await artplace.purchaseArtwork(56, { from: buyer, value: web3.utils.toWei('1', 'Ether')}).should.be.rejected; // FAILURE: artwork must have valid id     
-      await artplace.purchaseArtwork(ArtworkCount, { from: buyer, value: web3.utils.toWei('0.5', 'Ether') }).should.be.rejected;// FAILURE: Buyer doesnot have enough ether(money)
-      await artplace.purchaseArtwork(ArtworkCount, { from: deployer, value: web3.utils.toWei('1', 'Ether') }).should.be.rejected; // FAILURE: Deployer tries to buy the artwork, i.e., it cannot be purchased twice.
       await artplace.purchaseArtwork(ArtworkCount, { from: buyer, value: web3.utils.toWei('1', 'Ether') }).should.be.rejected;  // buyer cannot be the seller.
     })
+    it('sells artwork', async () => {
+    
+
+      result = await artplace.Sellit(ArtworkCount, { from: seller})//buyer purchase
+    
+      // Check logs
+      const event = result.logs[0].args
+      assert.equal(event.id.toNumber(), ArtworkCount.toNumber(), 'id is correct')
+      assert.equal(event.Artistname, 'Dave', 'Artist name is correct')
+      assert.equal(event.Artname, 'first', 'art name is correct')
+      assert.equal(event.price, '1000000000000000000', 'price is correct')
+      assert.equal(event.width,'70', 'width is correct')
+      assert.equal(event.height, '50', 'height is correct')
+      assert.equal(event.Description, 'My first digital artwork', 'Desc is correct')
+      assert.equal(event.owner, seller, 'owner is correct')
+      assert.equal(event.purchased, false, 'purchased is correct')
+    
+      
+      
+
+    })
+    it('sells artwork', async () => {
+    
+
+      result = await artplace.DontSellit(ArtworkCount, { from: seller})//buyer purchase
+    
+      // Check logs
+      const event = result.logs[0].args
+      assert.equal(event.id.toNumber(), ArtworkCount.toNumber(), 'id is correct')
+      assert.equal(event.Artistname, 'Dave', 'Artist name is correct')
+      assert.equal(event.Artname, 'first', 'art name is correct')
+      assert.equal(event.price, '1000000000000000000', 'price is correct')
+      assert.equal(event.width,'70', 'width is correct')
+      assert.equal(event.height, '50', 'height is correct')
+      assert.equal(event.Description, 'My first digital artwork', 'Desc is correct')
+      assert.equal(event.owner, seller, 'owner is correct')
+      assert.equal(event.purchased, true, 'purchased is correct')
+    
+      
+      
+
+    })
   })
+  
 })
 

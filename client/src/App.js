@@ -33,27 +33,25 @@
             Artplace.abi,
             deployedNetwork && deployedNetwork.address,
           );
-        
-          /* web3.eth.getBlock(20)
-          .then(function(value) {
-            console.log(value.timestamp);
-            var timestamp = moment.unix(value.timestamp);
-            console.log(timestamp.format('MMMM Do YYYY, h:mm:ss a'));
-            // expected output: "Success!"
-          }); */
           
-         /*   instance.events.Artworkcreated({
+          
+          var Ecount=0;
+          
+          instance.events.Artworkcreated({
+           // filter: { purchased: false},
             fromBlock: 0
-        }, function(error, event){  
-         console.log(event); 
-          //const Count =  this.state.pass(i).call();
-        //  for (var i = 1; i <= Count; i++) {
-       //   this.setState({
-       //       pass:[...this.state.pass(i).call(),event.returnValues.Artname]
-       //     })
-        }) */
+        }) .on('data', event => {
+          this.setState({
+            Ecount: [...this.state.Ecount, Object.values(event)],
+          })
+          console.log(this.state.Ecount);
+          console.log("---------------------------------------------------");
+          console.log(event);
+      
+        })
         
-          
+
+      
           const ArtworkCount = await instance.methods.ArtworkCount().call();
           const createArtwork = await instance.events.createArtwork;
           const purchaseArtwork= await instance.events.purchaseArtwork;
@@ -63,9 +61,24 @@
             this.setState({
               Artworks: [...this.state.Artworks, Artwork]
             })
+            console.log(this.state.Artworks)
           }
-
         console.log(ArtworkCount.toString());
+        console.log(this.state.Ecount[1][4])
+        for (var i = 0; i < ArtworkCount; i++) {
+          web3.eth.getBlock(this.state.Ecount[i][4])
+          .then(value => {
+            var timestamp = moment.unix(value.timestamp);
+            var update=timestamp.format('MMMM Do YYYY, h:mm:ss a')
+            this.setState({
+              Time: [...this.state.Time,update ],
+            })
+          }); 
+        }
+        
+       
+
+
           this.setState({ loading: false});
         } catch (error) {
           alert(
@@ -73,15 +86,15 @@
           );
           console.error(error);
         }
-        var loc = window.location.pathname;
-        var dir = loc.substring(0, loc.lastIndexOf('/'));
-        console.log(dir);
+        
+
+
 
 
   }
-
-
-
+  componentWillMount() {
+    this.initialState = this.state
+}
   constructor(props) {
   super(props)
   
@@ -89,9 +102,9 @@
       dir:"",
     account: '',
     name: [],
-    createArtwork: '',
-    purchaseArtwork: '',
     ArtworkCount: 0,
+    Ecount: [],
+    Time: [],
     Artworks: [],
     loading: true
   }
@@ -99,6 +112,8 @@
   this.createArtwork = this.createArtwork.bind(this);
   this.showusingID = this.showusingID.bind(this);
   this.purchaseArtwork = this.purchaseArtwork.bind(this);
+  this.Sellit = this.Sellit.bind(this);
+  this.DontSellit = this.DontSellit.bind(this);
   }
 
   createArtwork(Artistname,Artname,price,width,height,Description) {
@@ -123,17 +138,22 @@
       }
       )
     }
+  
     showusingBot= () => {
-    
+      this.setState(this.initialState)
       this.state.instance.events.Artworkcreated({
-           filter: { purchased: true},
+           filter: { purchased: false},
            fromBlock: 0
        }).on('data', event => {
-        this.setState({name:[...this.state.name,event.returnValues.Artistname ]});
+        this.setState(prevState =>({
+         
+        }));
+
+
         })
       }
       showusingID = ids => {
-       
+        this.setState(this.initialState)
         this.state.instance.events.Artworkcreated({
           filter: { id: ids},
           fromBlock: 0,
@@ -148,6 +168,20 @@
   purchaseArtwork(id, price) {
     this.setState({ loading: true })
     this.state.instance.methods.purchaseArtwork(id).send({ from: this.state.account, value: price })
+    .once('receipt', (receipt) => {
+    this.setState({ loading: false })
+  })
+  }
+  Sellit(id) {
+    this.setState({ loading: true })
+    this.state.instance.methods.Sellit(id).send({ from: this.state.account })
+    .once('receipt', (receipt) => {
+    this.setState({ loading: false })
+  })
+  }
+  DontSellit(id) {
+    this.setState({ loading: true })
+    this.state.instance.methods.DontSellit(id).send({ from: this.state.account })
     .once('receipt', (receipt) => {
     this.setState({ loading: false })
   })
@@ -176,6 +210,9 @@
                   Artworks={this.state.Artworks}
                   createArtwork={this.createArtwork}
                   purchaseArtwork={this.purchaseArtwork}
+                  Sellit={this.Sellit}
+                  purchaseArtwork={this.purchaseArtwork}
+                  DontSellit={this.DontSellit}
                   /> 
                     }
                       
@@ -187,13 +224,14 @@
               <Audit 
               Artworks={this.state.Artworks}
               instance={this.state.instance}
-              name={this.state.name}
+              Ecount={this.state.Ecount}
+              Time={this.state.Time}
                   createArtwork={this.createArtwork}
                   showProfile={this.showProfile}
                   showusingID={this.showusingID}
                   showusingBot={this.showusingBot}
                   events={this.events}
-                  purchaseArtwork={this.purchaseArtwork}/>
+                  />
             </Route>
           </Switch>
         </div>

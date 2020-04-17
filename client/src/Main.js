@@ -6,7 +6,9 @@ class Main extends Component {
 
   render() {
     //const web3 = await getWeb3();
+    console.log(this.props.Artworks.id);
     return (
+      
         <div id="lol">
       <div id="add">
         <h1>Add Artwork</h1>
@@ -94,7 +96,7 @@ class Main extends Component {
           <th scope="col"></th>
         </tr>
       </thead>
-      <tbody id="artlist">
+      <tbody id="prodlist">
       { this.props.Artworks.map((Artwork, key) => {
         return(
           <tr key={key}>
@@ -107,6 +109,7 @@ class Main extends Component {
             <td>
               { Artwork.purchased==false
                 ? <button
+                    
                     name={Artwork.id}
                     value={Artwork.price}
                     onClick={(event) => {
@@ -118,6 +121,35 @@ class Main extends Component {
                 : null
               }
               </td>
+              <td>
+    
+              { Artwork.purchased==true
+                ? <button
+               
+                    id={Artwork.id}
+                    onClick={(event) => {
+                      this.props.Sellit(Artwork.id)
+                    }}
+                  >
+                    sellitagain
+                  </button>
+                : null
+              }
+              </td>
+              <td>
+              { Artwork.purchased==false
+                ? <button
+                    name={Artwork.id}
+                    onClick={(event) => {
+                      this.props.DontSellit(event.target.name)
+                    }}
+                  >
+                    Buy
+                  </button>
+                : null
+              }
+              </td>
+              
           </tr>
           
         )
