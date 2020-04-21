@@ -6,10 +6,11 @@ class Main extends Component {
 
   render() {
     //const web3 = await getWeb3();
-    console.log(this.props.Artworks.id);
     return (
-      
-        <div id="lol">
+   <div id='lol'>
+   <div class="row">
+   <div class="col-md-11 offset-md-11"><a class="btn btn-primary1" href="/" role="button">Home</a></div>
+   </div>
       <div id="add">
         <h1>Add Artwork</h1>
         <form onSubmit={(event) => {
@@ -83,8 +84,8 @@ class Main extends Component {
         <p> </p>
       </div><div id="buy">
         
-        <h1>Buy Artwork</h1>
-        <table className="table">
+<div><h1>Buy Artwork</h1><h6>Are you a seller? Check out seller's page</h6><a href = "/seller"><h6>seller</h6></a>
+</div><table className="table">
 
         <thead>
         <tr>
@@ -97,7 +98,9 @@ class Main extends Component {
         </tr>
       </thead>
       <tbody id="prodlist">
+     
       { this.props.Artworks.map((Artwork, key) => {
+        console.log(this.props.Artworks)
         return(
           <tr key={key}>
           
@@ -107,41 +110,12 @@ class Main extends Component {
             <td>{window.web3.fromWei(Artwork.price.toString(), 'Ether')} Eth</td>
             <td>{Artwork.owner}</td>
             <td>
-              { Artwork.purchased==false
+              { Artwork.purchased==false && Artwork.owner!=this.props.account
                 ? <button
-                    
                     name={Artwork.id}
                     value={Artwork.price}
                     onClick={(event) => {
                       this.props.purchaseArtwork(event.target.name, event.target.value)
-                    }}
-                  >
-                    Buy
-                  </button>
-                : null
-              }
-              </td>
-              <td>
-    
-              { Artwork.purchased==true
-                ? <button
-               
-                    id={Artwork.id}
-                    onClick={(event) => {
-                      this.props.Sellit(Artwork.id)
-                    }}
-                  >
-                    sellitagain
-                  </button>
-                : null
-              }
-              </td>
-              <td>
-              { Artwork.purchased==false
-                ? <button
-                    name={Artwork.id}
-                    onClick={(event) => {
-                      this.props.DontSellit(event.target.name)
                     }}
                   >
                     Buy
@@ -159,6 +133,8 @@ class Main extends Component {
         </table>
       </div>
       </div>
+     
+      
     );
   }
 }

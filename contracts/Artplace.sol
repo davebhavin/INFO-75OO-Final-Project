@@ -85,6 +85,7 @@ contract Artplace {
         require(!_artwork.purchased);//check that artwork has not been purchased
         require(msg.value >= _artwork.price);//chcek min balance
         require(!_artwork.purchased);
+        _artwork.owner = msg.sender;
         _artwork.purchased = true;
         Artworks[_id] = _artwork;
         address(_seller).transfer(msg.value);

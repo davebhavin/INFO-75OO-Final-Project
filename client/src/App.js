@@ -4,7 +4,7 @@
   import "./App.css";
   import Navbar from './navbar';
   import Main from './Main';
-  import moment from 'moment';
+  import Seller from './Seller';
   import _ from 'lodash';
 
   import getWeb3 from "./getWeb3";
@@ -23,6 +23,8 @@
 
       try {
           const web3 = await getWeb3();
+          
+
           const account = await web3.eth.getAccounts();
           this.setState({ account: account[0] })
           const networkId = await web3.eth.net.getId();
@@ -33,25 +35,7 @@
             Artplace.abi,
             deployedNetwork && deployedNetwork.address,
           );
-          
-          
-          var Ecount=0;
-          
-          instance.events.Artworkcreated({
-           // filter: { purchased: false},
-            fromBlock: 0
-        }) .on('data', event => {
-          this.setState({
-            Ecount: [...this.state.Ecount, Object.values(event)],
-          })
-          console.log(this.state.Ecount);
-          console.log("---------------------------------------------------");
-          console.log(event);
-      
-        })
-        
 
-      
           const ArtworkCount = await instance.methods.ArtworkCount().call();
           const createArtwork = await instance.events.createArtwork;
           const purchaseArtwork= await instance.events.purchaseArtwork;
@@ -61,24 +45,9 @@
             this.setState({
               Artworks: [...this.state.Artworks, Artwork]
             })
-            console.log(this.state.Artworks)
           }
-        console.log(ArtworkCount.toString());
-        console.log(this.state.Ecount[1][4])
-        for (var i = 0; i < ArtworkCount; i++) {
-          web3.eth.getBlock(this.state.Ecount[i][4])
-          .then(value => {
-            var timestamp = moment.unix(value.timestamp);
-            var update=timestamp.format('MMMM Do YYYY, h:mm:ss a')
-            this.setState({
-              Time: [...this.state.Time,update ],
-            })
-          }); 
-        }
-        
-       
-
-
+          console.log(this.state.Artworks)
+      
           this.setState({ loading: false});
         } catch (error) {
           alert(
@@ -86,15 +55,15 @@
           );
           console.error(error);
         }
-        
-
-
+       
+       
 
 
   }
   componentWillMount() {
-    this.initialState = this.state
+    this.initialState = this.state;
 }
+  
   constructor(props) {
   super(props)
   
@@ -115,7 +84,7 @@
   this.Sellit = this.Sellit.bind(this);
   this.DontSellit = this.DontSellit.bind(this);
   }
-
+ 
   createArtwork(Artistname,Artname,price,width,height,Description) {
   this.setState({ loading: true })
   this.state.instance.methods.createArtwork(Artistname,Artname,price,width,height,Description).send({ from: this.state.account })
@@ -124,34 +93,127 @@
   })
   }
   showProfile(owners){
-    
-    this.state.instance.events.allEvents({
+    this.setState(this.initialState)
+    this.state.instance.events.Artworkcreated({
          filter: { owner: owners},
          fromBlock: 0
-     }, function(error, event){  
-      console.log(event);
-       //const Count =  this.state.pass(i).call();
-     //  for (var i = 1; i <= Count; i++) {
-    //   this.setState({
-    //       pass:[...this.state.pass(i).call(),event.returnValues.Artname]
-    //     })
-      }
-      )
+     }).on('data', event => {
+      this.setState({
+        Ecount: [...this.state.Ecount, Object.values(event)],
+      })
+    })
+    this.state.instance.events.ArtworkPurchased({
+         filter: { owner: owners},
+         fromBlock: 0
+     }).on('data', event => {
+      this.setState({
+        Ecount: [...this.state.Ecount, Object.values(event)],
+      })
+    })
+    this.state.instance.events.madeitavailable({
+         filter: { owner: owners},
+         fromBlock: 0
+     }).on('data', event => {
+      this.setState({
+        Ecount: [...this.state.Ecount, Object.values(event)],
+      })
+    })
+    this.state.instance.events.madeitunavailable({
+         filter: { owner: owners},
+         fromBlock: 0
+     }).on('data', event => {
+      this.setState({
+        Ecount: [...this.state.Ecount, Object.values(event)],
+      })
+    })
     }
   
     showusingBot= () => {
       this.setState(this.initialState)
       this.state.instance.events.Artworkcreated({
-           filter: { purchased: false},
+           filter: { purchased: !true},
            fromBlock: 0
        }).on('data', event => {
-        this.setState(prevState =>({
-         
-        }));
-
-
+        this.setState({
+          Ecount: [...this.state.Ecount, Object.values(event)],
         })
+      })
+      this.state.instance.events.madeitavailable({
+        filter: { purchased: !true},
+        fromBlock: 0
+    }).on('data', event => {
+    this.setState({
+      Ecount: [...this.state.Ecount, Object.values(event)],
+    })
+    })
       }
+      showallEvents= () => {
+        this.setState(this.initialState)
+        this.state.instance.events.allEvents({
+             fromBlock: 0
+         }).on('data', event => {
+          this.setState({
+            Ecount: [...this.state.Ecount, Object.values(event)],
+          })
+        })
+        }
+        showArtworkcreated= () => {
+          this.setState(this.initialState)
+          this.state.instance.events.Artworkcreated({
+               fromBlock: 0
+           }).on('data', event => {
+            this.setState({
+              Ecount: [...this.state.Ecount, Object.values(event)],
+            })
+          })
+          }
+          showArtworkPurchased= () => {
+            this.setState(this.initialState)
+            this.state.instance.events.ArtworkPurchased({
+                 fromBlock: 0
+             }).on('data', event => {
+              this.setState({
+                Ecount: [...this.state.Ecount, Object.values(event)],
+              })
+            })
+            }
+
+      showusingSellable= () => {
+        this.setState(this.initialState)
+        this.state.instance.events.Artworkcreated({
+             filter: { purchased: true.toString()},
+             fromBlock: 0
+         }).on('data', event => {
+          this.setState({
+            Ecount: [...this.state.Ecount, Object.values(event)],
+          })
+        })
+        this.state.instance.events.ArtworkPurchased({
+          filter: { purchased: true.toString()},
+          fromBlock: 0
+      }).on('data', event => {
+       this.setState({
+         Ecount: [...this.state.Ecount, Object.values(event)],
+       })
+     })
+     this.state.instance.events.madeitavailable({
+            filter: { purchased: true.toString()},
+            fromBlock: 0
+        }).on('data', event => {
+        this.setState({
+          Ecount: [...this.state.Ecount, Object.values(event)],
+        })
+      })
+      this.state.instance.events.madeitunavailable({
+        filter: { purchased: true.toString()},
+        fromBlock: 0
+      }).on('data', event => {
+      this.setState({
+      Ecount: [...this.state.Ecount, Object.values(event)],
+      })
+      })
+     
+        }
       showusingID = ids => {
         this.setState(this.initialState)
         this.state.instance.events.Artworkcreated({
@@ -160,9 +222,21 @@
         }
         )
         .on('data', event => {
-          console.log(event)
-          this.setState({name:[...this.state.name,event.returnValues.Artistname ]});
+          this.setState({
+            Ecount: [...this.state.Ecount, Object.values(event)],
+          })
         })
+        this.state.instance.events.ArtworkPurchased({
+          filter: { id: ids},
+          fromBlock: 0,
+        }
+        )
+        .on('data', event => {
+          this.setState({
+            Ecount: [...this.state.Ecount, Object.values(event)],
+          })
+        })
+       
       }
 
   purchaseArtwork(id, price) {
@@ -207,6 +281,7 @@
                   { this.state.loading 
                   ? <div id="loader" className="text-center"><p className="text-center">Loading...</p></div>
                   : <Main 
+                  account={this.state.account}
                   Artworks={this.state.Artworks}
                   createArtwork={this.createArtwork}
                   purchaseArtwork={this.purchaseArtwork}
@@ -220,9 +295,35 @@
               </div>
             </div>
             </Route>
+            <Route path="/seller">
+            <Navbar account={this.state.account} />
+            <div className="container-fluid mt-5">
+              <div className="row">
+              <main role="main" className="col-lg-12 d-flex">
+                  { this.state.loading 
+                  ? <div id="loader" className="text-center"><p className="text-center">Loading...</p></div>
+                  : <Seller 
+                  account={this.state.account}
+                  Artworks={this.state.Artworks}
+                  Ecount={this.state.Ecount}
+                  Time={this.state.Time}
+                  createArtwork={this.createArtwork}
+                  purchaseArtwork={this.purchaseArtwork}
+                  Sellit={this.Sellit}
+                  purchaseArtwork={this.purchaseArtwork}
+                  DontSellit={this.DontSellit}
+                  showusingSellable={this.showusingSellable}
+                  showArtworkPurchased={this.showArtworkPurchased}
+                  /> 
+                    }
+                      
+              </main>
+              </div>
+            </div>
+            </Route>
             <Route path="/audit">
               <Audit 
-              Artworks={this.state.Artworks}
+              //Artworks={this.state.Artworks}
               instance={this.state.instance}
               Ecount={this.state.Ecount}
               Time={this.state.Time}
@@ -230,7 +331,11 @@
                   showProfile={this.showProfile}
                   showusingID={this.showusingID}
                   showusingBot={this.showusingBot}
-                  events={this.events}
+                  showusingSellable={this.showusingSellable}
+                  showArtworkPurchased={this.showArtworkPurchased}
+                  showArtworkcreated={this.showArtworkcreated}
+                  showallEvents={this.showallEvents}
+                //  DontSellit={this.DontSellit}
                   />
             </Route>
           </Switch>

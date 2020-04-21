@@ -37,19 +37,19 @@ class Audit extends Component {
     
     <form onSubmit={(event) => {
       event.preventDefault()
-      this.props.showusingBot();
+      this.props.showallEvents();
     }}>
       <button type="submit" className="btn btn-primary_3">List all events</button>
     </form>
     <form onSubmit={(event) => {
       event.preventDefault()
-      this.props.showusingBot();
+      this.props.showArtworkcreated();
     }}>
       <button type="submit" className="btn btn-primary_3">List events where artwork was created </button>
     </form>
     <form onSubmit={(event) => {
       event.preventDefault()
-      this.props.showusingBot();
+      this.props.showArtworkPurchased();
     }}>
       <button type="submit" className="btn btn-primary_3">List events where artwork was purchased</button>
     </form>
@@ -63,10 +63,10 @@ class Audit extends Component {
     }}>
       <button type="submit" className="btn btn-primary_2">Search</button>
     </form>
-    <h6>Artwork or sale</h6>
+    <h6>Artwork for sale</h6>
     <form onSubmit={(event) => {
       event.preventDefault()
-      this.props.showusingBot();
+      this.props.showusingSellable();
     }}>
       <button type="submit" className="btn btn-primary_2">Search</button>
     </form>
@@ -182,14 +182,11 @@ class Audit extends Component {
               </div>
             </Card.Body>
               <Card.Footer className="footer">
-              <div class="container">
-              <div class="row">
+             
               <div class="col" ><b>Signature:</b> {Ecount[10]} </div>
-              <div class="col"><b>Timestamp:</b> <br/> {this.props.Time[Ecount[8][0]-1]}</div></div></div>
+            
               </Card.Footer>
             </Card>
-            
-            
             
             </Card.Body>
           

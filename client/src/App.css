@@ -157,6 +157,7 @@ html {
 }
 #lol{
   background: seashell;
+  background-color: seashell;
 }
 #notsold{
   margin-top: 20px;
@@ -200,4 +201,20 @@ html {
 .footer{
   background-color:rgb(253, 240, 231);
   text-align: left;
+}
+.btn-primary1{
+  align-self:auto;
+  color:#fff;
+  color: rgb(209, 126, 66);
+  background-color:rgb(255, 250, 247);
+  border-color:rgb(196, 107, 44);
+  width: 65px;
+}
+.btn-primary2{
+  align-self:auto;
+  color:#fff;
+  color: rgb(209, 126, 66);
+  background-color:rgb(255, 250, 247);
+  border-color:rgb(196, 107, 44);
+  width: 109px;
 }
