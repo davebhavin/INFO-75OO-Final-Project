@@ -1,14 +1,27 @@
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import ModalPage from './Modal';
+import Modal from 'react-bootstrap/Modal';
+//import showModal from 'react-bootstrap/showModal';
+//import isOpen from 'react-bootstrap/isOpen';
+//import hideModal from 'react-bootstrap/hideModal';
+//import Modal from 'react-bootstrap/Modal';
+var QRCode = require('qrcode.react');
 
 
 class Main extends Component {
+  
+ 
 
   render() {
     //const web3 = await getWeb3();
+  
     return (
+     
    <div id='lol'>
+   
    <div class="row">
+   
    <div class="col-md-11 offset-md-11"><a class="btn btn-primary1" href="/" role="button">Home</a></div>
    </div>
       <div id="add">
@@ -97,7 +110,7 @@ class Main extends Component {
           <th scope="col"></th>
         </tr>
       </thead>
-      <tbody id="prodlist">
+      <tbody id="artlist">
      
       { this.props.Artworks.map((Artwork, key) => {
         console.log(this.props.Artworks)
@@ -110,8 +123,24 @@ class Main extends Component {
             <td>{window.web3.fromWei(Artwork.price.toString(), 'Ether')} Eth</td>
             <td>{Artwork.owner}</td>
             <td>
+            
+            
+    
+         
+            <QRCode
+            value={Artwork.id}
+            size={128}
+            bgColor={"#ffffff"}
+            fgColor={"#000000"}
+            level={"L"}
+            includeMargin={false}
+            renderAs={"svg"}
+           
+          />
+          </td>
+            <td>
               { Artwork.purchased==false && Artwork.owner!=this.props.account
-                ? <button
+                ? <div><button
                     name={Artwork.id}
                     value={Artwork.price}
                     onClick={(event) => {
@@ -120,7 +149,10 @@ class Main extends Component {
                   >
                     Buy
                   </button>
+                  
+                  </div>
                 : null
+                
               }
               </td>
               

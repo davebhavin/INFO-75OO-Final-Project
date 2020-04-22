@@ -4,21 +4,37 @@ import Jumbotron from 'react-bootstrap/Jumbotron';
 import Container from 'react-bootstrap/Container';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
-import Button from 'react-bootstrap/Button';
-import ListGroup from 'react-bootstrap/ListGroup';
-import Tab from 'react-bootstrap/Tab';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Navbar from './navbar.js';
+import QrReader from 'react-qr-reader'
+ 
 
+import moment from 'moment';
+import Moment from 'react-moment';
 
 
 class Audit extends Component {
 
+  convert(time){
+   return moment(time).format('MMMM Do YYYY, h:mm:ss a')
+  }
+  state = {
+    result: 'No id has been dectected so far'
+  }
+ 
+  handleScan = data => {
+    if (data) {
+      this.setState({
+        result: data
+      })
+      this.props.showusingID(this.state.result);
+    }
+    
+  }
+  handleError = err => {
+    console.error(err)
+  }
  
   render() {
-    
-
+    console.log(moment(1587508161).format('MMMM Do YYYY, h:mm:ss a'))
     return (
      
       
@@ -29,7 +45,8 @@ class Audit extends Component {
         <h1>Audit Page</h1>
       </Container>
     </Jumbotron>
-
+    
+    
         
     <Jumbotron fluid className="jumbo" >
     <Container>
@@ -41,6 +58,7 @@ class Audit extends Component {
     }}>
       <button type="submit" className="btn btn-primary_3">List all events</button>
     </form>
+    
     <form onSubmit={(event) => {
       event.preventDefault()
       this.props.showArtworkcreated();
@@ -174,6 +192,7 @@ class Audit extends Component {
                 <b>Description:</b> {Ecount[8][6]}<br />
                 <b>owner:</b> {Ecount[8][7]}<br />
                 <b>purchased:</b> {Ecount[8][8].toString()}<br />
+                
                 </Card.Text>
               </Card.Body>
               </Card>
@@ -182,8 +201,8 @@ class Audit extends Component {
               </div>
             </Card.Body>
               <Card.Footer className="footer">
-             
-              <div class="col" ><b>Signature:</b> {Ecount[10]} </div>
+              
+              <div class="col" ><b>Signature:</b> {Ecount[10]} <b>purchased:</b> <Moment unix >{Ecount[8][9]}</Moment>  </div>
             
               </Card.Footer>
             </Card>
@@ -194,6 +213,20 @@ class Audit extends Component {
         </Card>
           </Accordion>
      ) })}
+     <Jumbotron fluid className="jum">
+     <Container>
+     <div>
+     <QrReader
+       delay={300}
+       onError={this.handleError}
+       onScan={this.handleScan}
+       style={{ width: '20%' }}
+     />
+     <p>{this.state.result}</p>
+   </div>
+     </Container>
+   </Jumbotron>
+
 
  
         

@@ -28,7 +28,7 @@ class Seller extends Component {
           <th scope="col"></th>
         </tr>
       </thead>
-      <tbody id="prodlist">
+      <tbody id="artlist">
       { this.props.Artworks.map((Artwork, key) => {
         return(
           <tr key={key}>

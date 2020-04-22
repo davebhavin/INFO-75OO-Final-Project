@@ -1,9 +1,12 @@
   import React, { Component } from "react";
   import 'bootstrap/dist/css/bootstrap.min.css';
-  import LPage from './LPage';
+  import Jumbotron from 'react-bootstrap/Jumbotron';
+  import Container from 'react-bootstrap/Container';
   import "./App.css";
-  import Navbar from './navbar';
+  import Navbar1 from './navbar';
+  import {Navbar,Nav,Form,FormControl,Button} from 'react-bootstrap/';
   import Main from './Main';
+  import Main2 from './Main2';
   import Seller from './Seller';
   import _ from 'lodash';
 
@@ -37,16 +40,24 @@
           );
 
           const ArtworkCount = await instance.methods.ArtworkCount().call();
+          const ArtworkCount1 = await instance.methods.ArtworkCount1().call();
           const createArtwork = await instance.events.createArtwork;
+          const createArtwork1 = await instance.events.createArtwork1;
           const purchaseArtwork= await instance.events.purchaseArtwork;
-          this.setState({ web3, instance ,ArtworkCount,createArtwork,purchaseArtwork}, this.runExample);
+          this.setState({ web3, instance ,ArtworkCount,createArtwork1,createArtwork,purchaseArtwork}, this.runExample);
           for (var i = 1; i <= ArtworkCount; i++) {
             const Artwork = await instance.methods.Artworks(i).call()
             this.setState({
               Artworks: [...this.state.Artworks, Artwork]
             })
           }
-          console.log(this.state.Artworks)
+           for (var i = 1; i <= ArtworkCount1; i++) {
+            const Artwork1 = await instance.methods.Artworks1(i).call()
+            this.setState({
+              Artworks1: [...this.state.Artworks1, Artwork1]
+            })
+          }
+          console.log(this.state.Artworks1) 
       
           this.setState({ loading: false});
         } catch (error) {
@@ -72,15 +83,19 @@
     account: '',
     name: [],
     ArtworkCount: 0,
+    ArtworkCount1: 0,
     Ecount: [],
     Time: [],
     Artworks: [],
+    Artworks1: [],
     loading: true
   }
   this.showProfile = this.showProfile.bind(this);
   this.createArtwork = this.createArtwork.bind(this);
+  this.createArtwork1 = this.createArtwork1.bind(this);
   this.showusingID = this.showusingID.bind(this);
   this.purchaseArtwork = this.purchaseArtwork.bind(this);
+  this.bid = this.bid.bind(this);
   this.Sellit = this.Sellit.bind(this);
   this.DontSellit = this.DontSellit.bind(this);
   }
@@ -92,6 +107,13 @@
   this.setState({ loading: false })
   })
   }
+  createArtwork1(Artistname,price,numBlocksActionOpen) {
+    this.setState({ loading: true })
+    this.state.instance.methods.createArtwork1(Artistname,price,numBlocksActionOpen).send({ from: this.state.account })
+    .once('receipt', (receipt) => {
+    this.setState({ loading: false })
+    })
+    }
   showProfile(owners){
     this.setState(this.initialState)
     this.state.instance.events.Artworkcreated({
@@ -241,7 +263,16 @@
 
   purchaseArtwork(id, price) {
     this.setState({ loading: true })
+    console.log(id,price)
     this.state.instance.methods.purchaseArtwork(id).send({ from: this.state.account, value: price })
+    .once('receipt', (receipt) => {
+    this.setState({ loading: false })
+  })
+  }
+  bid(id,bid) {
+    this.setState({ loading: true })
+    console.log(id,bid)
+    this.state.instance.methods.bid(id).send({ value: bid,from: this.state.account })
     .once('receipt', (receipt) => {
     this.setState({ loading: false })
   })
@@ -274,7 +305,7 @@
               <Home />
             </Route>
             <Route path="/trad">
-            <Navbar account={this.state.account} />
+            <Navbar1 account={this.state.account} />
             <div className="container-fluid mt-5">
               <div className="row">
               <main role="main" className="col-lg-12 d-flex">
@@ -286,7 +317,32 @@
                   createArtwork={this.createArtwork}
                   purchaseArtwork={this.purchaseArtwork}
                   Sellit={this.Sellit}
+                  DontSellit={this.DontSellit}
+                  /> 
+                    }
+                      
+              </main>
+              </div>
+            </div>
+            </Route>
+            <Route exact path="/">
+              <Home />
+            </Route>
+            <Route path="/auction">
+            <Navbar1 account={this.state.account} />
+            <div className="container-fluid mt-5">
+              <div className="row">
+              <main role="main" className="col-lg-12 d-flex">
+                  { this.state.loading 
+                  ? <div id="loader" className="text-center"><p className="text-center">Loading...</p></div>
+                  : <Main2 
+                  account={this.state.account}
+                  Artworks={this.state.Artworks}
+                  Artworks1={this.state.Artworks1}
+                  createArtwork1={this.createArtwork1}
                   purchaseArtwork={this.purchaseArtwork}
+                  bid={this.bid}
+                  Sellit={this.Sellit}
                   DontSellit={this.DontSellit}
                   /> 
                     }
@@ -296,7 +352,7 @@
             </div>
             </Route>
             <Route path="/seller">
-            <Navbar account={this.state.account} />
+            <Navbar1 account={this.state.account} />
             <div className="container-fluid mt-5">
               <div className="row">
               <main role="main" className="col-lg-12 d-flex">
@@ -310,7 +366,7 @@
                   createArtwork={this.createArtwork}
                   purchaseArtwork={this.purchaseArtwork}
                   Sellit={this.Sellit}
-                  purchaseArtwork={this.purchaseArtwork}
+
                   DontSellit={this.DontSellit}
                   showusingSellable={this.showusingSellable}
                   showArtworkPurchased={this.showArtworkPurchased}
@@ -348,7 +404,25 @@
 
   function Home() {
     return (
-      
+      <div>
+      <Navbar bg="dark" variant="dark">
+    <Navbar.Brand href="#home">Navbar</Navbar.Brand>
+    <Nav className="mr-auto">
+      <Nav.Link href="/audit">Audit</Nav.Link>
+      <Nav.Link href="/trad">Trad</Nav.Link>
+      <Nav.Link href="/auction">Auction</Nav.Link>
+    </Nav>
+  </Navbar>
+
+      <Jumbotron fluid className="jumo">
+  <Container>
+    <h1>Art marketplace using blockchain</h1>
+    <p>
+     
+    </p>
+  </Container>
+</Jumbotron>
+
       <div class="card-group">
       <div class="card">
           <div class="card-body">
@@ -358,7 +432,7 @@
       <div class="card">
           <div class="card-body">
               <h4 class="card-title">Auction</h4>
-              <p class="card-text">comming soon</p><Link to="/trad"></Link></div>
+              <p class="card-text">Here the seller can auction their products to the buyer</p><Link to="/auction">Auction</Link></div>
       </div>
       <div class="card">
           <div class="card-body">
@@ -366,11 +440,9 @@
               <p class="card-text">Auditing the smart contract's events</p><Link to="/audit">Audit</Link></div>
       </div>
 
-      <input type="file" id="input" multiple>
-     
-      </input>
+    
   </div>
-      
+  </div>
 
     );
   }
