@@ -4,14 +4,16 @@ contract Artplace {
     string public name;
     uint public ArtworkCount = 0;
     uint public ArtworkCount1 = 0;
+    address payable returnBidder;
+    address payable highestbidder;
+    uint returnBid;
     mapping(uint => Artwork) public Artworks;
     mapping(uint => ArtworkAuction) public Artworks1;
-    mapping(address => uint) pendingReturns;
 
     constructor() public {
         name = "Art using Blockchain";
     }
-
+    
     struct Artwork {
         uint id;
         string Artistname;
@@ -82,8 +84,12 @@ contract Artplace {
         bool indexed purchased,
           uint timestamp
     );
-    event SomeoneBid(address bidder, uint amount);
+    event SomeoneBid(address bidder, uint amount,address highestBidder, uint highestBid);
     event AuctionEnded(address winner, uint amount);
+
+    
+   
+
     function createArtwork(string memory _Artistname,string memory _Artname, uint _price, uint _width,uint _height,string memory _Description) public {
     // Require a valid Artist name
     require(bytes(_Artistname).length > 0);
@@ -96,6 +102,7 @@ contract Artplace {
     Artworks[ArtworkCount] = Artwork(ArtworkCount, _Artistname, _Artname,_price,_width,_height,_Description, msg.sender, false);
     emit Artworkcreated(ArtworkCount, _Artistname, _Artname,_price,_width,_height,_Description, msg.sender, false,block.timestamp);// Trigger an event
 }
+
 
     function purchaseArtwork(uint _id) public payable {
         Artwork memory _artwork = Artworks[_id];//fetch the artwork
@@ -142,29 +149,28 @@ contract Artplace {
         
     ArtworkAuction memory _artwork = Artworks1[_id];//fetch the artwork
     address  _seller = _artwork.owner1;//fetch the owner
-    if (block.number <= (_artwork.StartingBlockNum + _artwork.numBlocksActionOpen)) {
-    require(msg.value > _artwork.highestBid,"The given box number is not valid please enter valid box");
-    require(msg.sender!=_seller);
-    if (_artwork.highestBid != 0) {
-            pendingReturns[_artwork.highestBidder] += _artwork.highestBid;
+    require (block.number <= (_artwork.StartingBlockNum + _artwork.numBlocksActionOpen));
+        require(msg.value > _artwork.highestBid,"The given box number is not valid please enter valid box");
+        require(msg.sender!=_seller);
+        require(!_artwork.ended);
+        returnBid = _artwork.highestBid;
+        returnBidder = _artwork.highestBidder;
+        _artwork.highestBidder = msg.sender;
+        highestbidder= msg.sender;
+        _artwork.highestBid = msg.value;
+        Artworks1[_id] = _artwork;
+        returnBidder.transfer(returnBid);
+        emit SomeoneBid(msg.sender, msg.value,_artwork.highestBidder,_artwork.highestBid);
+        if(block.number == (_artwork.StartingBlockNum + _artwork.numBlocksActionOpen)){
+             _artwork.ended = true;
+             Artworks1[_id] = _artwork;
+             auctionEnd(_id);
         }
-    _artwork.highestBidder = msg.sender;
-    _artwork.highestBid = msg.value;
-        emit SomeoneBid(msg.sender, msg.value);
-    }
-    else{
-        auctionEnd(_id);
-    }
     }
     function auctionEnd(uint _id) public {
     ArtworkAuction memory _artwork = Artworks1[_id];//fetch the artwork
-    require(block.number > (_artwork.StartingBlockNum + _artwork.numBlocksActionOpen),"auction is still going on");
-    require(!_artwork.ended);
-    _artwork.ended = true;
-      
     _artwork.owner1.transfer(_artwork.highestBid);
         emit AuctionEnded(_artwork.highestBidder, _artwork.highestBid);
     }
-
 
 }

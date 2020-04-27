@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import {Navbar,Nav,Form,FormControl,Button} from 'react-bootstrap/';
 
 class Seller extends Component {
 
@@ -11,6 +11,7 @@ class Seller extends Component {
       
         <div id="lol">
         <div class="row">
+        
         <div class="col-md-11 offset-md-10"><a class="btn btn-primary2" href="/" role="button">Home</a></div>
         </div>
       <div id="buy">

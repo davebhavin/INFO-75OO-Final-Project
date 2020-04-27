@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import {Navbar,Nav,Form,FormControl,Button} from 'react-bootstrap/';
 
 
 class Main2 extends Component {
@@ -71,12 +72,13 @@ class Main2 extends Component {
      
       { this.props.Artworks1.map((Artwork, key) => {
         //console.log(this.props.Artworks1)
+        console.log(Artwork)
         return(
           <tr key={key}>
           
             <th scope="row">{Artwork.id.toString()}</th>
             <td>{Artwork.Artname}</td>
-            <td>{window.web3.fromWei(Artwork.price.toString(), 'Ether')} Eth</td>
+            <td>{window.web3.fromWei(Artwork.highestBid.toString(), 'Ether')} Eth</td>
             <td>{Artwork.owner1}</td>
             
             <td>
@@ -87,8 +89,8 @@ class Main2 extends Component {
           event.preventDefault()
          
           const Artname = this.Artname.value;
-          console.log(Artname.toString());
-          this.props.bid(Artwork.id,Artname.toString())
+          console.log(Artname,Artwork.highestBid);
+          this.props.bid(Artwork.id,Artname*1000000000000000000)
         }}>
           
           <div className="form-group mr-sm-2">
@@ -108,7 +110,7 @@ class Main2 extends Component {
         </form>
         <p> </p>
       </div>
-                : null
+                : Artwork.ended==true ? <h6 className="H6">SOLD</h6>:null
               }
               </td>
              

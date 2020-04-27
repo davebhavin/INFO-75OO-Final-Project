@@ -5,7 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Accordion from 'react-bootstrap/Accordion';
 import Card from 'react-bootstrap/Card';
 import QrReader from 'react-qr-reader'
- 
+import {Navbar,Nav,Form,FormControl,Button} from 'react-bootstrap/';
 
 import moment from 'moment';
 import Moment from 'react-moment';
@@ -40,7 +40,15 @@ class Audit extends Component {
       
       <div id="haha">
       <div id="audit">
-      <Jumbotron fluid>
+      <Navbar bg="dark" variant="dark">
+    <Navbar.Brand href="/">Navbar</Navbar.Brand>
+    <Nav className="mr-auto">
+      <Nav.Link href="/audit">Audit</Nav.Link>
+      <Nav.Link href="/trad">Trad</Nav.Link>
+      <Nav.Link href="/auction">Auction</Nav.Link>
+    </Nav>
+  </Navbar>
+      <Jumbotron fluid className="jumo">
       <Container>
         <h1>Audit Page</h1>
       </Container>
@@ -202,7 +210,7 @@ class Audit extends Component {
             </Card.Body>
               <Card.Footer className="footer">
               
-              <div class="col" ><b>Signature:</b> {Ecount[10]} <b>purchased:</b> <Moment unix >{Ecount[8][9]}</Moment>  </div>
+              <div class="col" ><b>Signature:</b> {Ecount[10]} <b>Timestamp:</b> <Moment unix >{Ecount[8][9]}</Moment>  </div>
             
               </Card.Footer>
             </Card>

@@ -107,7 +107,7 @@ class Main extends Component {
           <th scope="col">Art Name</th>
           <th scope="col">Price</th>
           <th scope="col">Owner</th>
-          <th scope="col"></th>
+          <th scope="col">Unique Id</th>
         </tr>
       </thead>
       <tbody id="artlist">

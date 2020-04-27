@@ -58,7 +58,9 @@
             })
           }
           console.log(this.state.Artworks1) 
-      
+          window.ethereum.on('accountsChanged', function (accounts) {
+            window.location.reload();
+          })
           this.setState({ loading: false});
         } catch (error) {
           alert(
@@ -67,9 +69,6 @@
           console.error(error);
         }
        
-       
-
-
   }
   componentWillMount() {
     this.initialState = this.state;
@@ -96,6 +95,7 @@
   this.showusingID = this.showusingID.bind(this);
   this.purchaseArtwork = this.purchaseArtwork.bind(this);
   this.bid = this.bid.bind(this);
+ // this.checkEnd = this.checkEnd.bind(this);
   this.Sellit = this.Sellit.bind(this);
   this.DontSellit = this.DontSellit.bind(this);
   }
@@ -105,6 +105,7 @@
   this.state.instance.methods.createArtwork(Artistname,Artname,price,width,height,Description).send({ from: this.state.account })
   .once('receipt', (receipt) => {
   this.setState({ loading: false })
+  window.location.reload();
   })
   }
   createArtwork1(Artistname,price,numBlocksActionOpen) {
@@ -112,6 +113,7 @@
     this.state.instance.methods.createArtwork1(Artistname,price,numBlocksActionOpen).send({ from: this.state.account })
     .once('receipt', (receipt) => {
     this.setState({ loading: false })
+    window.location.reload();
     })
     }
   showProfile(owners){
@@ -267,21 +269,33 @@
     this.state.instance.methods.purchaseArtwork(id).send({ from: this.state.account, value: price })
     .once('receipt', (receipt) => {
     this.setState({ loading: false })
+    window.location.reload();
   })
   }
   bid(id,bid) {
     this.setState({ loading: true })
-    console.log(id,bid)
+    console.log(id,bid);
+   
     this.state.instance.methods.bid(id).send({ value: bid,from: this.state.account })
     .once('receipt', (receipt) => {
     this.setState({ loading: false })
+    window.location.reload();
   })
   }
+  /* checkEnd(id,bid) {
+    this.setState({ loading: true })
+    console.log(id,bid)
+    this.state.instance.methods.bid(id).send({ from: this.state.account })
+    .once('receipt', (receipt) => {
+    this.setState({ loading: false })
+  })
+  } */
   Sellit(id) {
     this.setState({ loading: true })
     this.state.instance.methods.Sellit(id).send({ from: this.state.account })
     .once('receipt', (receipt) => {
     this.setState({ loading: false })
+    window.location.reload();
   })
   }
   DontSellit(id) {
@@ -289,6 +303,7 @@
     this.state.instance.methods.DontSellit(id).send({ from: this.state.account })
     .once('receipt', (receipt) => {
     this.setState({ loading: false })
+    window.location.reload();
   })
   }
   
@@ -342,6 +357,7 @@
                   createArtwork1={this.createArtwork1}
                   purchaseArtwork={this.purchaseArtwork}
                   bid={this.bid}
+                  //checkEnd={this.checkEnd}
                   Sellit={this.Sellit}
                   DontSellit={this.DontSellit}
                   /> 
@@ -406,7 +422,7 @@
     return (
       <div>
       <Navbar bg="dark" variant="dark">
-    <Navbar.Brand href="#home">Navbar</Navbar.Brand>
+    <Navbar.Brand href="/">Home</Navbar.Brand>
     <Nav className="mr-auto">
       <Nav.Link href="/audit">Audit</Nav.Link>
       <Nav.Link href="/trad">Trad</Nav.Link>
