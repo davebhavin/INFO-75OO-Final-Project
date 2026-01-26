@@ -10,7 +10,7 @@
     "chai-as-promised": "7.1.1",
     "chai-bignumber": "^3.0.0",
     "jquery": "^3.4.1",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.23",
     "mdbreact": "^4.25.6",
     "moment": "^2.24.0",
     "popper": "^1.0.1",
